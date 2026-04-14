@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI News Dashboard</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <main class="container">
+        <header class="header">
+            <h1>AI News Aggregator</h1>
+            <form method="post" action="/run-daily">
+                <button type="submit">Run Daily Pipeline</button>
+            </form>
+        </header>
+        {% if message %}
+            <p class="notice">{{ message }}</p>
+        {% endif %}
+
+        <section class="panel">
+            <h2>Email Subscription</h2>
+            <article class="card">
+                <form method="post" action="/subscribe" class="inline-form">
+                    <input name="name" type="text" placeholder="Your name" required>
+                    <input name="email" type="email" placeholder="Your email" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+                <form method="post" action="/unsubscribe" class="inline-form">
+                    <input name="email" type="email" placeholder="Email to unsubscribe" required>
+                    <button type="submit">Unsubscribe</button>
+                </form>
+                <p class="meta">Active subscribers: {{ subscribers|length }}</p>
+                {% if subscribers %}
+                    <div class="subscriber-list">
+                        <h3>Subscriber Details</h3>
+                        {% for subscriber in subscribers %}
+                            <p class="meta">
+                                {{ subscriber.name }} · {{ subscriber.email }} · joined {{ subscriber.created_at }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </article>
+        </section>
+
+        <section class="panel">
+            <h2>Recent Daily Digests</h2>
+            {% if digests %}
+                {% for digest in digests %}
+                    <article class="card">
+                        <p class="meta">{{ digest.digest_date }}</p>
+                        <h3>{{ digest.title }}</h3>
+                        <p>{{ digest.summary }}</p>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <p>No digests yet.</p>
+            {% endif %}
+        </section>
+
+        <section class="panel">
+            <h2>Recent Articles</h2>
+            {% if articles %}
+                {% for article in articles %}
+                    <article class="card">
+                        <p class="meta">{{ article.published_at }} · {{ article.source.name }}</p>
+                        <h3><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></h3>
+                        <p>{{ article.summary or "Summary pending." }}</p>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <p>No articles yet.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
